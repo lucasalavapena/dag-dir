@@ -54,6 +54,6 @@ It is writing in python (I in particular during development was using 3.10.9), j
 ## Usage Set Up 
 
 So far I have only tested it on Linux, will test it on Windows. 
-This would work best on a vertical screen, as the height is most important, since right now I am only writing text from left to right not top to bottom or similar.
+This would work best on a horizontal screen setup, as the height is most important, since right now I am only writing text from left to right not top to bottom or similar.
 
 
