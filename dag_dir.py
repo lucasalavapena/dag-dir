@@ -12,7 +12,10 @@ from layout_transforms import transform_layout
 from graph import get_edges_vertices
 
 
-def dag_dir(path: Path, *, canvas_size: Tuple[int, int]=(30, 80)):
+def dag_dir(path: Path, *, canvas_size: Tuple[int, int] = (30, 80), max_depth = None):
+    if max_depth is not None:
+        assert max_depth > 0, "maximum depth argument has to be positive"
+
     path = os.path.abspath(path)
 
     if not os.path.exists(path):
@@ -20,7 +23,7 @@ def dag_dir(path: Path, *, canvas_size: Tuple[int, int]=(30, 80)):
         raise FileNotFoundError(msg)
 
     canvas = ASCIICanvas(*canvas_size)
-    edges, vertices_dict = get_edges_vertices(path)
+    edges, vertices_dict = get_edges_vertices(path, max_depth)
 
     max_node_size = max(len(v) for v in vertices_dict.values())
 
@@ -43,10 +46,11 @@ if __name__ == "__main__":
     )
     parser.add_argument('path', type=str)
     parser.add_argument('-cs', '--canvas-size', type=int, nargs=2)
+    parser.add_argument('-md', '--max-depth', type=int, default=None)
 
     opt = parser.parse_args()
 
     if opt.canvas_size:
-        dag_dir(opt.path, canvas_size=tuple(opt.canvas_size))
+        dag_dir(opt.path, canvas_size=tuple(opt.canvas_size), max_depth=opt.max_depth)
     else:
-        dag_dir(opt.path)
+        dag_dir(opt.path, max_depth=opt.max_depth)

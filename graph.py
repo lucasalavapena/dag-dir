@@ -23,7 +23,7 @@ class Vertex(NamedTuple):
             return iter(str(self.abs_path))
              
 
-def get_edges_vertices(path):
+def get_edges_vertices(path, max_depth = None):
     edges = []
     curr_dir = Path(path)
 
@@ -47,7 +47,10 @@ def get_edges_vertices(path):
 
         return nodes[key]
 
-    for (dir_path, dir_names, file_names) in os.walk(path, followlinks=True):
+    for depth, (dir_path, dir_names, file_names) in enumerate(os.walk(path, followlinks=True), 1):
+        if max_depth is not None and depth > max_depth:
+            break
+
         parent_vertex = nodes[dir_path]
 
         for file_name in file_names + dir_names:
