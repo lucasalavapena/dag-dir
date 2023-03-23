@@ -1,6 +1,8 @@
 from typing import NamedTuple, Iterable, SupportsFloat
 import os
 
+from utils import color_symbolic
+
 def sign(x: SupportsFloat):
     if x == 0:
         return 0
@@ -84,20 +86,20 @@ class ASCIICanvas:
         is_empty = curr_char == ASCIICanvas.EMPTY_CHAR
         return is_empty or (curr_char == ASCIICanvas.LINE_CHAR and desired_char != ASCIICanvas.LINE_CHAR)
 
-    def modify_coordinate(self, coord: Coord2D, value: str):
+    def modify_coordinate(self, coord: Coord2D, value: str, *, is_sym: bool = False):
         # TODO raise custom error messages for Index Error
         if isinstance(value, Iterable):
             for i, v in enumerate(value):
                 if self.should_overdraw((coord.x, coord.y + i), v):
-                    self._canvas[coord.x][coord.y + i] = v
+                    self._canvas[coord.x][coord.y + i] = color_symbolic(v) if is_sym else v
         else:
             value = str(value)
             if self.should_overdraw(coord, value):
-                self._canvas[coord.x][coord.y] = value
+                self._canvas[coord.x][coord.y] = color_symbolic(value) if is_sym else value
 
 
     # inclusive??
-    def add_line_between(self, src_coord: Coord2D, dest_coord: Coord2D, src_size: int, dest_size: int, *, x_padding: int = 0, y_padding: int = 1):
+    def add_line_between(self, src_coord: Coord2D, dest_coord: Coord2D, src_size: int, dest_size: int, *, x_padding: int = 0, y_padding: int = 1, is_sym: bool = False):
         # TODO make padding both sides equally
 
         # easier to deal with horizontal lines separately
@@ -109,9 +111,9 @@ class ASCIICanvas:
             # note the -2 in the step argument of range is -1 twice, once for getting the correct index (dest_size)
             # and then second for padding
             for new_y in range(src_coord.y + dy * y_padding, dest_coord.y - dy * (y_padding + dest_size), dy):
-                self.modify_coordinate(Coord2D(src_coord.x, new_y), ASCIICanvas.LINE_CHAR)
+                self.modify_coordinate(Coord2D(src_coord.x, new_y), ASCIICanvas.LINE_CHAR, is_sym=is_sym)
                         
-            self.modify_coordinate(Coord2D(src_coord.x, new_y + dy), ">" if dy > 0 else "<")
+            self.modify_coordinate(Coord2D(src_coord.x, new_y + dy), ">" if dy > 0 else "<", is_sym=is_sym)
         else:
             src_mid_coord = src_coord + Coord2D(0, src_size // 2)
             dest_mid_coord = dest_coord + Coord2D(0, dest_size // 2)
@@ -126,12 +128,12 @@ class ASCIICanvas:
 
             for new_x in range(src_mid_coord.x + dx * (x_padding + 1), dest_mid_coord.x - dx * (x_padding + 1), dx):
                 new_y = round(y_intercept + gradient * new_x)
-                self.modify_coordinate(Coord2D(new_x, new_y), ASCIICanvas.LINE_CHAR)
+                self.modify_coordinate(Coord2D(new_x, new_y), ASCIICanvas.LINE_CHAR, is_sym=is_sym)
 
             arrow_x = (new_x + dest_mid_coord.x) // 2
             arrow_y = (new_y + dest_mid_coord.y) // 2
 
-            self.modify_coordinate(Coord2D(arrow_x, arrow_y), "∨" if dx > 0 else "^")
+            self.modify_coordinate(Coord2D(arrow_x, arrow_y), "∨" if dx > 0 else "^", is_sym=is_sym)
 
 
 if __name__ == "__main__":

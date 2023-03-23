@@ -29,10 +29,10 @@ def dag_dir(path: Path, *, canvas_size: Tuple[int, int]=(30, 80)):
     layout_dict, canvas = transform_layout(layout_dict, canvas)
 
     for node_id, coord in layout_dict.items():
-        canvas.modify_coordinate(coord, node_id)
+        canvas.modify_coordinate(coord, node_id, is_sym=node_id.is_sym)
     
     for src, dest in edges:
-        canvas.add_line_between(layout_dict[src], layout_dict[dest], len(src),len(dest))
+        canvas.add_line_between(layout_dict[src], layout_dict[dest], len(src),len(dest), is_sym=src.is_sym)
     
     canvas.draw()
 
